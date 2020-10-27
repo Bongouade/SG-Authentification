@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:toast/toast.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -28,6 +30,23 @@ class _HomeState extends State<Home> {
             _buildResultPassword(),
             _buildKeyboard(isValid),
             _buildbtnValid(isValid),
+            Container(
+              height: 75.0,
+              padding: EdgeInsets.all(10.0),
+              width: MediaQuery.of(context).size.width * 0.3,
+              color: Colors.black,
+              child: Text(
+                "code:\n" + _password,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 20.0,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20.0,
+            )
           ],
         ),
       ),
@@ -87,13 +106,15 @@ class _HomeState extends State<Home> {
     List<Widget> _touchKeyboard = List.generate(N, (index) {
       return InkWell(
         onTap: !isValidPassword ? () => _addNumber(_numbers[index]) : null,
-        onHighlightChanged: (bool value) => setState((){
+        onHighlightChanged: (bool value) => setState(() {
           _overlayTouch = value;
           _indexLongPress = index;
         }),
         child: Container(
           decoration: BoxDecoration(
-            color: (_overlayTouch && _indexLongPress == index)? Colors.grey[350]: Colors.grey[200],
+            color: (_overlayTouch && _indexLongPress == index)
+                ? Colors.grey[350]
+                : Colors.grey[200],
             borderRadius: BorderRadius.circular(7.0),
             border: Border.all(color: Colors.grey[400]),
           ),
@@ -126,7 +147,17 @@ class _HomeState extends State<Home> {
 
   Widget _buildbtnValid(bool isValidBtn) {
     return GestureDetector(
-      onTap: isValidBtn ? () => print("click btn") : null,
+      onTap: isValidBtn
+          ? () {
+              setState(() {
+                _numbers.shuffle();
+                _password = "";
+                _passwordLenght = 0;
+              });
+              Toast.show("Vérification en cours", context,
+                  duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+            }
+          : null,
       child: Opacity(
         opacity: isValidBtn ? 1.0 : 0.5,
         child: Container(
@@ -160,6 +191,7 @@ class _HomeState extends State<Home> {
 
   _reinitPassword() {
     setState(() {
+      _numbers.shuffle();
       _password = "";
       _passwordLenght = 0;
     });
